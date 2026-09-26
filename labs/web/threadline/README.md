@@ -1,6 +1,8 @@
 
 # ThreadLine — `MEDIUM` · `web`
 
+---
+
 ## Brief
 
 ThreadLine sells clothing through a REST API. No frontend, no docs. You
@@ -24,20 +26,25 @@ text
 Wait for `{"status":"ok"}` before sending further requests.
 
 There is no web frontend — this is an API-only challenge. Use `curl`,
-`httpie`, Postman, Burp Repeater, or a script.
+`httpie`, Postman, Burp Repeater, or a script; whatever you're comfortable
+driving raw HTTP requests with.
 
-Register and log in:
-POST /api/v1/auth/register
-{ "username": "...", "email": "...", "password": "..." }
+## Setup
 
-POST /api/v1/auth/login
-{ "email": "...", "password": "..." }
+1. Register your own account:
+   ```
+   POST /api/v1/auth/register
+   { "username": "...", "email": "...", "password": "..." }
+   ```
+2. Log in — the API uses a session cookie, not a bearer token:
+   ```
+   POST /api/v1/auth/login
+   { "email": "...", "password": "..." }
+   ```
+3. Explore from there. Every account starts with a small balance, but that's
+   not enough to buy anything on its own.
 
-text
-
-No API documentation is provided. Map the rest of the surface yourself.
-
-## Endpoints
+## Endpoints (non-exhaustive — some may not matter, some might matter a lot)
 
 | Method | Path                          | Notes                         |
 |--------|-------------------------------|--------------------------------|
@@ -64,6 +71,8 @@ docker compose restart
 text
 
 State resets to the seeded starting point on every restart.
+
+See [how to play](/play) for the usual solve loop.
 
 ## Rules
 
