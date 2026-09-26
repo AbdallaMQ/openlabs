@@ -58,33 +58,18 @@ def parse_bracket_list(text: str) -> list[str]:
     return [item.strip() for item in text[1:-1].split(",") if item.strip()]
 
 
-def check_lab_status(
-    meta: dict[str, str],
-    *,
-    require_status: bool = False,
-) -> tuple[list[str], list[str]]:
-    """Validate the lab catalog status field.
-
-    Returns (errors, warnings). During migration, missing status is a warning
-    and implies experimental. When require_status is true, missing status is
-    an error instead.
-    """
+def check_lab_status(meta: dict[str, str]) -> list[str]:
+    """Validate the lab catalog status field."""
     errors: list[str] = []
-    warnings: list[str] = []
     raw = meta.get("status", "").strip()
     if not raw:
-        if require_status:
-            errors.append("lab.yml: missing or empty `status`")
-        else:
-            warnings.append(
-                "lab.yml: missing `status`; treated as experimental during migration"
-            )
-        return errors, warnings
+        errors.append("lab.yml: missing or empty `status`")
+        return errors
     if raw not in STATUSES:
         errors.append(
             f"lab.yml: `status` {raw!r} must be one of {sorted(STATUSES)}"
         )
-    return errors, warnings
+    return errors
 
 
 def discover_uncatalogued_dirs() -> list[Path]:
@@ -143,6 +128,8 @@ def check_lab(lab: Path) -> list[str]:
 
     if not HASH_RE.match(meta["flag_hash"]):
         errors.append("lab.yml: `flag_hash` must be 64 lowercase hex characters")
+
+    errors.extend(check_lab_status(meta))
 
     techniques_raw = meta.get("techniques", "")
     if techniques_raw:
@@ -220,8 +207,13 @@ def main() -> int:
         return 1
 
     failures = 0
+    status_counts = {"experimental": 0, "supported": 0}
     for lab in labs:
         errors = check_lab(lab)
+        meta = parse_flat_yaml((lab / "lab.yml").read_text(encoding="utf-8"))
+        status = meta.get("status", "").strip()
+        if status in status_counts:
+            status_counts[status] += 1
         if args.compose:
             for compose_name in COMPOSE_NAMES:
                 compose_file = lab / compose_name
@@ -240,7 +232,19 @@ def main() -> int:
         print(f"failed {failures} of {len(labs)} labs ({checked})")
         return 1
 
-    print(f"validated {len(labs)} labs ({checked})")
+    uncatalogued = discover_uncatalogued_dirs()
+    if uncatalogued:
+        print(
+            f"uncatalogued directories ({len(uncatalogued)}; not in public catalog):"
+        )
+        for path in uncatalogued:
+            print(f"  {path.relative_to(REPO_ROOT)}")
+
+    print(
+        f"validated {len(labs)} labs ({checked}): "
+        f"{status_counts['supported']} supported, "
+        f"{status_counts['experimental']} experimental"
+    )
     return 0
 
 
