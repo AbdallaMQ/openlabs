@@ -12,6 +12,8 @@ Recover the full flag by progressing through the different API services exposed 
 
 The challenge involves multiple API technologies, including REST, GraphQL, and gRPC.
 
+See [how to play](/play) for the usual solve loop.
+
 ## Difficulty
 
 **Hard**
