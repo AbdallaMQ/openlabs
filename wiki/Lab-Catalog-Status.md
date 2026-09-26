@@ -19,9 +19,8 @@ Do not infer status from directory presence, README wording, site copy, or
 
 ## Migration
 
-During migration, a missing `status` is treated as `experimental` and the
-validator emits a warning. After migration, missing `status` becomes a hard
-error. See issue M0-02 for the PR sequence.
+Missing `status` is a validation error. Set `experimental` or `supported`
+explicitly in every catalogued lab.
 
 ## Uncatalogued directories
 
@@ -50,5 +49,6 @@ python3 scripts/test_validate_status.py
 python3 scripts/validate.py
 ```
 
-The fixture runner covers valid, missing, and invalid `status` values. Full
-labs gain explicit status in a follow-up migration pull request.
+The fixture runner covers valid, missing, and invalid `status` values.
+`python3 scripts/validate.py` prints catalog counts and lists uncatalogued
+directories separately.
