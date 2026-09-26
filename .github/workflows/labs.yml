@@ -49,6 +49,26 @@ jobs:
           docker compose version
           python3 scripts/validate.py --compose
 
+  reference-lab:
+    name: Prove duck-cross L0-L6
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prove reference lab lifecycle
+        run: python3 scripts/prove_reference_lab.py --json reference-lab-evidence.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reference-lab-evidence
+          path: reference-lab-evidence.json
+
   security:
     name: Security scan
     runs-on: ubuntu-latest
