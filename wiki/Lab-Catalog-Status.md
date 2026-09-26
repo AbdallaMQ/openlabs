@@ -42,6 +42,10 @@ the gate, or lost evidence), set `status: experimental` until the evidence is
 restored. Do not leave `supported` on a lab that no longer passes the
 baseline checks.
 
+Promotion and demotion rules stay in this page. **`duck-cross`** is the
+reference supported lab; CI proves L0–L6 with
+`python3 scripts/prove_reference_lab.py`.
+
 ## Local checks
 
 ```bash
